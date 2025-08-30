@@ -30,7 +30,17 @@ function saveData(data) {
 // Get all courses
 app.get('/courses', (req, res) => {
     const data = loadData();
-    res.json(data.courses);
+    let courses = data.courses;
+
+    const descriptionFilter = req.query.description;
+    if (descriptionFilter) {
+        // Filter if the course's description includes the substring
+        courses = courses.filter(c =>
+            c.description.toLowerCase().includes(descriptionFilter.toLowerCase())
+        );
+    }
+
+    res.json(courses);
 });
 
 // Get a course by ID
@@ -74,8 +84,6 @@ app.post('/students', (req, res) => {
     const newStudent = req.body;
     // Simple ID generation
     newStudent.id = Date.now();
-    // Initialize enrolledCourses if not present
-    newStudent.enrolledCourses = [];
     data.students.push(newStudent);
     saveData(data);
     res.status(201).json(newStudent);
